@@ -142,8 +142,8 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
       - name: cargo doc
         run: |
-          cargo doc --no-deps -F log
-          cargo doc --no-deps -F defmt
+          cargo doc --no-deps -F log --locked
+          cargo doc --no-deps -F defmt --locked
         env:
           RUSTDOCFLAGS: --cfg docsrs
 
@@ -169,7 +169,7 @@ jobs:
       # intentionally no target specifier; see https://github.com/jonhoo/rust-ci-conf/pull/4
       # --feature-powerset runs for every combination of features
       - name: cargo hack
-        run: cargo hack --feature-powerset --mutually-exclusive-features=log,defmt check
+        run: cargo hack --feature-powerset --mutually-exclusive-features=log,defmt check --locked
 
   deny:
     # cargo-deny checks licenses, advisories, sources, and bans for
@@ -193,7 +193,7 @@ jobs:
         with:
           log-level: warn
           command: check
-          arguments: --all-features
+          arguments: --all-features --locked
 
   test:
     runs-on: ubuntu-latest
@@ -211,7 +211,7 @@ jobs:
       - name: Install stable
         uses: dtolnay/rust-toolchain@stable
       - name: cargo test
-        run: cargo test
+        run: cargo test --locked
 
   msrv:
     # check that we can build using the minimal rust version that is specified by this crate
@@ -236,8 +236,8 @@ jobs:
           toolchain: ${{ matrix.msrv }}
       - name: cargo +${{ matrix.msrv }} check
         run: |
-          cargo check -F log
-          cargo check -F defmt
+          cargo check -F log --locked
+          cargo check -F defmt --locked
 
 
   check-arm-examples:
@@ -284,7 +284,7 @@ jobs:
       - name: cargo check
         working-directory: ${{ matrix.example_directory }}
         run: |
-          cargo check
+          cargo check --locked
   
   vet:
     # cargo-vet checks for unvetted dependencies in the Cargo.lock file
