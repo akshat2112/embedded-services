@@ -323,6 +323,7 @@ jobs:
     #   run: echo "Cargo vet failed. Please refer to https://${{ github.repository }}/supply-chain/README.md to review the unvetted dependencies."
 
     - name: Save PR number
+      if: ${{ success() }} || ${{ failure }}
       run: |
         mkdir -p ./pr
         echo ${{ github.event.number }} > ./pr/NR
