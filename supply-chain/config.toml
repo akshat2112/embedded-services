@@ -11,35 +11,31 @@ url = "https://raw.githubusercontent.com/google/rust-crate-audits/main/audits.to
 url = "https://raw.githubusercontent.com/mozilla/supply-chain/main/audits.toml"
 
 [policy.embassy-executor]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-executor-macros]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-futures]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-hal-internal]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-imxrt]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-sync]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-time]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-time-driver]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [policy.embassy-time-queue-utils]
-audit-as-crates-io = true
-
-[[exemptions.ahash]]
-version = "0.8.11"
-criteria = "safe-to-deploy"
+audit-as-crates-io = false
 
 [[exemptions.anyhow]]
 version = "1.0.97"
@@ -163,42 +159,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.device-driver-macros]]
 version = "1.0.4"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-executor]]
-version = "0.7.0@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-executor-macros]]
-version = "0.6.2@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-futures]]
-version = "0.1.1@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-hal-internal]]
-version = "0.2.0@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-imxrt]]
-version = "0.1.0@git:63fb93a53dfa3c7a94677eab3231612279854cb4"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-sync]]
-version = "0.6.2@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-time]]
-version = "0.4.0@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-time-driver]]
-version = "0.2.0@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
-criteria = "safe-to-deploy"
-
-[[exemptions.embassy-time-queue-utils]]
-version = "0.1.0@git:a137a160671d3ede48519e5faf316f31f6f6cbd3"
 criteria = "safe-to-deploy"
 
 [[exemptions.embedded-hal]]
