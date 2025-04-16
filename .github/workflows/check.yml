@@ -324,8 +324,9 @@ jobs:
 
     - name: Save PR number
       if: ${{ success() }} || ${{ failure() }}
-    - run: mkdir -p ./pr
-    - run: echo ${{ github.event.number }} > ./pr/NR
+      run: |
+        mkdir -p ./pr
+        echo ${{ github.event.number }} > ./pr/NR
     - uses: actions/upload-artifact@v4
       with:
         name: pr
