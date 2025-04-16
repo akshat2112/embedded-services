@@ -317,7 +317,13 @@ jobs:
     - name: Invoke cargo-vet
       run: cargo vet --locked
     
-    - name: Error message and resolution
-      # This step will only run if the cargo-vet step fails
-      if: ${{ failure() }}
-      run: echo "Cargo vet failed. Please refer to https://${{ github.repository }}/supply-chain/README.md to review the unvetted dependencies."
+    - name: Save PR number
+      if: ${{ success() }} || ${{ failure() }}
+      run: |
+        mkdir -p ./pr
+        echo ${{ github.event.number }} > ./pr/NR
+    - uses: actions/upload-artifact@v4
+      # if: ${{ success() }} || ${{ failure() }}
+      with:
+        name: pr
+        path: pr/
