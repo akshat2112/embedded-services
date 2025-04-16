@@ -29,6 +29,7 @@ jobs:
         with:
           name: pr
           path: pr/
+          run-id: ${{ github.event.workflow_run.id }}
           # script: |
           #   var artifacts = await github.actions.listWorkflowRunArtifacts({
           #      owner: context.repo.owner,
