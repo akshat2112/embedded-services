@@ -1,0 +1,205 @@
+# This workflow triggers after cargo vet has run.
+# It adds a comment to the PR with the results of the cargo vet run.
+
+name: Cargo vet PR comment
+
+# Controls when the workflow will run
+on:
+  workflow_run:
+    workflows: [check]
+    types:
+      - completed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  post-comment-failure:
+    # This job runs when the cargo-vet job fails
+    # It will download the artifact from the failed job and post a comment on the PR
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: 'Download artifact'
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: pr
+          path: pr/
+          run-id: ${{ github.event.workflow_run.id }}
+      
+      - name: 'Get PR number'
+        uses: actions/github-script@v7
+        with:
+          # github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var fs = require('fs');
+            var issue_number = Number(fs.readFileSync('./pr/NR'));
+            echo "PR_NUMBER=issue_number" >> $GITHUB_ENV
+      
+      - name: 'Find existing comment'
+        id: find-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: $PR_NUMBER
+          comment-author: 'github-actions[bot]'
+          body-includes: '[cargo vet]'
+
+      - name: 'Comment on PR - Failure'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: $PR_NUMBER
+          body: |
+            # [cargo vet] Dependencies Audit Failed
+
+            `cargo vet` has failed in this PR. Please run `cargo vet --locked` locally to check for new or updated unvetted dependencies.
+            Details about the vetting process can be found in [README.md](../blob/main/supply-chain/README.md)
+                      
+            ## If the unvetted dependencies are not needed
+            Please modify Cargo.toml file to avoid including the dependencies.
+                      
+            ## If the unvetted dependencies are needed
+            Post a new comment to the PR with your reasoning to help the auditors vet the dependencies.
+            After the auditors have vetted the dependencies, the PR will need to be rebased to pick up the new audits and pass this check.
+                      
+            ### Copy and paste the questionnaire below and provide your answers:
+                
+            **1. What crates (with version) need to be audited?**
+                
+            **2. How many of the crates are version updates vs new dependencies?**
+                
+            **3. Did you confirm none of the already existing crates serve the same purpose?**
+                
+            **4. Any extra notes to the auditors to help with their audits.**"
+          edit-mode: replace
+        # uses: actions/github-script@v7
+        # with:
+        #   # github-token: ${{ secrets.GITHUB_TOKEN }}
+        #   script: |
+        #     await github.rest.issues.createComment({
+        #       owner: context.repo.owner,
+        #       repo: context.repo.repo,
+        #       issue_number: $PR_NUMBER,
+        #       body:
+        #         "# [cargo vet] Dependencies Audit Failed
+
+        #         `cargo vet` has failed in this PR. Please run `cargo vet --locked` locally to check for new or updated unvetted dependencies.
+        #         Details about the vetting process can be found in [README.md](../blob/main/supply-chain/README.md)
+                      
+        #         ## If the unvetted dependencies are not needed
+        #         Please modify Cargo.toml file to avoid including the dependencies.
+                      
+        #         ## If the unvetted dependencies are needed
+        #         Post a new comment to the PR with your reasoning to help the auditors vet the dependencies.
+        #         After the auditors have vetted the dependencies, the PR will need to be rebased to pick up the new audits and pass this check.
+                      
+        #         ### Copy and paste the questionnaire below and provide your answers:
+                
+        #         **1. What crates (with version) need to be audited?**
+                
+        #         **2. How many of the crates are version updates vs new dependencies?**
+                
+        #         **3. Did you confirm none of the already existing crates serve the same purpose?**
+                
+        #         **4. Any extra notes to the auditors to help with their audits.**"
+        #     });
+  
+  post-comment-success:
+    # This job runs when the cargo-vet job succeeds after having failed at least once
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: 'Download artifact'
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: pr
+          path: pr/
+          run-id: ${{ github.event.workflow_run.id }}
+      
+      - name: 'Get PR number'
+        id: get-pr-number
+        uses: actions/github-script@v7
+        with:
+          # github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var fs = require('fs');
+            var issue_number = Number(fs.readFileSync('./pr/NR'));
+            echo "PR_NUMBER=issue_number" >> $GITHUB_ENV
+      
+      - name: 'Find existing comment'
+        id: find-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: $PR_NUMBER
+          comment-author: 'github-actions[bot]'
+          body-includes: '[cargo vet]'
+
+      - name: 'Comment on PR - Success'
+        if: steps.find-comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: $PR_NUMBER
+          body: |
+            # [cargo vet] Dependencies Audit Passed
+            `cargo vet` has passed in this PR. No new unvetted dependencies were found.
+          edit-mode: replace
+  
+    #     post-comment-success:
+    # # This job runs when the cargo-vet job succeeds
+    # runs-on: ubuntu-latest
+    # if: >
+    #   github.event.workflow_run.event == 'pull_request' &&
+    #   github.event.workflow_run.conclusion == 'success'
+    # steps:
+    #   - name: 'Download artifact'
+    #     uses: actions/github-script@v7
+    #     with:
+    #       script: |
+    #         var artifacts = await github.actions.listWorkflowRunArtifacts({
+    #            owner: context.repo.owner,
+    #            repo: context.repo.repo,
+    #            run_id: ${{ github.event.workflow_run.id }},
+    #         });
+    #         var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+    #           return artifact.name == "pr"
+    #         })[0];
+    #         var download = await github.actions.downloadArtifact({
+    #            owner: context.repo.owner,
+    #            repo: context.repo.repo,
+    #            artifact_id: matchArtifact.id,
+    #            archive_format: 'zip',
+    #         });
+    #         var fs = require('fs');
+    #         fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
+    #   - run: unzip pr.zip
+
+    #   - name: 'Comment on PR - Success'
+    #     uses: actions/github-script@v3
+    #     with:
+    #       github-token: ${{ secrets.GITHUB_TOKEN }}
+    #       script: |
+    #         var fs = require('fs');
+    #         var issue_number = Number(fs.readFileSync('./NR'));
+    #         await github.issues.createComment({
+    #           owner: context.repo.owner,
+    #           repo: context.repo.repo,
+    #           issue_number: issue_number,
+    #           body: 'Success. Everything is OK. Thank you for the PR!'
+    #         });
+    #   # - name: 'Comment on PR - Success'
+    #   #   uses: thollander/actions-comment-pull-request@v3
+    #   #   with:
+    #   #       message: |
+    #   #         # Dependencies Audit Passed
+    #   #         `cargo vet` has passed in this PR. No new unvetted dependencies were found.
+    #   #       comment-tag: cargo-vet
+    #   #       mode: recreate
+    #   #       create-if-not-exists: false
