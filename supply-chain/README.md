@@ -37,4 +37,4 @@ All dependencies are vetted.
 
 ### Submit PR with the new audits
 
-Submit updated _audits.toml_ and/or _imports.lock_ to the PR to ensure audits are updated.
+Submit updated _audits.toml_ and/or _imports.lock_ to the PR to ensure audits are updated. .
