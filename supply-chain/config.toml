@@ -37,10 +37,6 @@ audit-as-crates-io = false
 [policy.embassy-time-queue-utils]
 audit-as-crates-io = false
 
-[[exemptions.anyhow]]
-version = "1.0.97"
-criteria = "safe-to-deploy"
-
 [[exemptions.arraydeque]]
 version = "0.5.1"
 criteria = "safe-to-deploy"
