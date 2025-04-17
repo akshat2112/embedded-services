@@ -45,7 +45,7 @@ jobs:
         id: find-comment
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: $PR_NUMBER
+          issue-number: ${{ env.PR_NUMBER }}
           comment-author: 'github-actions[bot]'
           body-includes: '[cargo vet]'
 
@@ -53,7 +53,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
-          issue-number: $PR_NUMBER
+          issue-number: ${{ env.PR_NUMBER }}
           body: |
             # [cargo vet] Dependencies Audit Failed
 
@@ -138,7 +138,7 @@ jobs:
         id: find-comment
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: $PR_NUMBER
+          issue-number: ${{ env.PR_NUMBER }}
           comment-author: 'github-actions[bot]'
           body-includes: '[cargo vet]'
 
@@ -147,7 +147,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
-          issue-number: $PR_NUMBER
+          issue-number: ${{ env.PR_NUMBER }}
           body: |
             # [cargo vet] Dependencies Audit Passed
             `cargo vet` has passed in this PR. No new unvetted dependencies were found.
