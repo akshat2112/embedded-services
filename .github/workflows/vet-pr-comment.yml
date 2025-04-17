@@ -39,6 +39,7 @@ jobs:
             var fs = require('fs');
             var issue_number = Number(fs.readFileSync('./pr/NR'));
             fs.appendFileSync(process.env.GITHUB_ENV, 'PR_NUMBER=${issue_number}');
+            console.log('PR_NUMBER=${issue_number}');
       
       - name: 'Find existing comment'
         id: find-comment
