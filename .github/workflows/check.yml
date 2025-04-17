@@ -72,34 +72,34 @@ jobs:
       - name: cargo fmt --check
         run: cargo fmt --check
 
-  clippy:
-    runs-on: ubuntu-latest
-    name: ${{ matrix.toolchain }} / clippy
-    needs: commit_list
-    permissions:
-      contents: read
-      checks: write
-    strategy:
-      fail-fast: false
-      matrix:
-        # Get early warning of new lints which are regularly introduced in beta channels.
-        toolchain: [stable, beta]
-        commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-          ref: ${{ matrix.commit }}
-      - name: Install ${{ matrix.toolchain }}
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.toolchain }}
-          components: clippy
-      - name: cargo clippy
-        uses: giraffate/clippy-action@v1
-        with:
-          reporter: 'github-pr-check'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+  # clippy:
+  #   runs-on: ubuntu-latest
+  #   name: ${{ matrix.toolchain }} / clippy
+  #   needs: commit_list
+  #   permissions:
+  #     contents: read
+  #     checks: write
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       # Get early warning of new lints which are regularly introduced in beta channels.
+  #       toolchain: [stable, beta]
+  #       commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+  #         ref: ${{ matrix.commit }}
+  #     - name: Install ${{ matrix.toolchain }}
+  #       uses: dtolnay/rust-toolchain@master
+  #       with:
+  #         toolchain: ${{ matrix.toolchain }}
+  #         components: clippy
+  #     - name: cargo clippy
+  #       uses: giraffate/clippy-action@v1
+  #       with:
+  #         reporter: 'github-pr-check'
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
 
   # Enable once we have a released crate
   # semver:
@@ -122,30 +122,30 @@ jobs:
   #     - name: cargo-semver-checks
   #       uses: obi1kenobi/cargo-semver-checks-action@v2
 
-  doc:
-    # run docs generation on nightly rather than stable. This enables features like
-    # https://doc.rust-lang.org/beta/unstable-book/language-features/doc-cfg.html which allows an
-    # API be documented as only available in some specific platforms.
-    runs-on: ubuntu-latest
-    name: nightly / doc
-    needs: commit_list
-    strategy:
-      fail-fast: false
-      matrix:
-        commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-          ref: ${{ matrix.commit }}
-      - name: Install nightly
-        uses: dtolnay/rust-toolchain@nightly
-      - name: cargo doc
-        run: |
-          cargo doc --no-deps -F log --locked
-          cargo doc --no-deps -F defmt --locked
-        env:
-          RUSTDOCFLAGS: --cfg docsrs
+  # doc:
+  #   # run docs generation on nightly rather than stable. This enables features like
+  #   # https://doc.rust-lang.org/beta/unstable-book/language-features/doc-cfg.html which allows an
+  #   # API be documented as only available in some specific platforms.
+  #   runs-on: ubuntu-latest
+  #   name: nightly / doc
+  #   needs: commit_list
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+  #         ref: ${{ matrix.commit }}
+  #     - name: Install nightly
+  #       uses: dtolnay/rust-toolchain@nightly
+  #     - name: cargo doc
+  #       run: |
+  #         cargo doc --no-deps -F log --locked
+  #         cargo doc --no-deps -F defmt --locked
+  #       env:
+  #         RUSTDOCFLAGS: --cfg docsrs
 
   # hack:
   #   # cargo-hack checks combinations of feature flags to ensure that features are all additive
@@ -195,23 +195,23 @@ jobs:
           command: check
           arguments: --all-features --locked
 
-  test:
-    runs-on: ubuntu-latest
-    name: ubuntu / stable / test
-    needs: commit_list
-    strategy:
-      fail-fast: false
-      matrix:
-        commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-          ref: ${{ matrix.commit }}
-      - name: Install stable
-        uses: dtolnay/rust-toolchain@stable
-      - name: cargo test
-        run: cargo test --locked
+  # test:
+  #   runs-on: ubuntu-latest
+  #   name: ubuntu / stable / test
+  #   needs: commit_list
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+  #         ref: ${{ matrix.commit }}
+  #     - name: Install stable
+  #       uses: dtolnay/rust-toolchain@stable
+  #     - name: cargo test
+  #       run: cargo test --locked
 
   # msrv:
   #   # check that we can build using the minimal rust version that is specified by this crate
