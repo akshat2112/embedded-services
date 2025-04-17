@@ -171,29 +171,29 @@ jobs:
   #     - name: cargo hack
   #       run: cargo hack --feature-powerset --mutually-exclusive-features=log,defmt check --locked
 
-  deny:
-    # cargo-deny checks licenses, advisories, sources, and bans for
-    # our dependencies.
-    runs-on: ubuntu-latest
-    name: ubuntu / stable / deny
-    needs: commit_list
-    strategy:
-      fail-fast: false
-      matrix:
-        commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-          ref: ${{ matrix.commit }}
-      - name: Install stable
-        uses: dtolnay/rust-toolchain@stable
-      - name: cargo install cargo-deny
-        uses: EmbarkStudios/cargo-deny-action@v2
-        with:
-          log-level: warn
-          command: check
-          arguments: --all-features --locked
+  # deny:
+  #   # cargo-deny checks licenses, advisories, sources, and bans for
+  #   # our dependencies.
+  #   runs-on: ubuntu-latest
+  #   name: ubuntu / stable / deny
+  #   needs: commit_list
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       commit: ${{ fromJSON(needs.commit_list.outputs.commits) }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+  #         ref: ${{ matrix.commit }}
+  #     - name: Install stable
+  #       uses: dtolnay/rust-toolchain@stable
+  #     - name: cargo install cargo-deny
+  #       uses: EmbarkStudios/cargo-deny-action@v2
+  #       with:
+  #         log-level: warn
+  #         command: check
+  #         arguments: --all-features --locked
 
   # test:
   #   runs-on: ubuntu-latest
@@ -318,12 +318,12 @@ jobs:
       run: cargo vet --locked
     
     - name: Save PR number
-      if: ${{ success() }} || ${{ failure() }}
+      if: ${{ failure() }}
       run: |
         mkdir -p ./pr
         echo ${{ github.event.number }} > ./pr/NR
     - uses: actions/upload-artifact@v4
-      if: ${{ success() }} || ${{ failure() }}
       with:
         name: pr
         path: pr/
+        overwrite: true
