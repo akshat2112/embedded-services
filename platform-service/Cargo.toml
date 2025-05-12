@@ -17,6 +17,7 @@ heapless.workspace = true
 log = { workspace = true, optional = true }
 embassy-imxrt = { workspace = true, optional = true, features = [
     "unstable-pac",
+    "time-driver-os-timer",
 ] }
 cortex-m = { workspace = true, optional = true }
 
